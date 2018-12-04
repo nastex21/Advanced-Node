@@ -1,15 +1,14 @@
 'use strict';
 
 const express     = require('express');
-const bodyParser  = require('body-parser');
 const fccTesting  = require('./freeCodeCamp/fcctesting.js');
 
 const app = express();
 
 fccTesting(app); //For FCC testing purposes
 app.use('/public', express.static(process.cwd() + '/public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: false}));
+app.use(express.json);
 
 app.route('/')
   .get((req, res) => {
