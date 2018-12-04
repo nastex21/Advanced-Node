@@ -6,6 +6,7 @@ const passport = require('passport');
 const session = require('express-session');
 const mongo = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
+const LocalStrategy = require('passport-local');
 
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 app.use(express.urlencoded({
@@ -44,6 +45,18 @@ mongo.connect(process.env.MONGO_URI, (err, db) => {
         }
       );
     });
+
+    passport.use(new LocalStrategy(
+      function(username, password, done) {
+        db.collection('users').findOne({ username: username }, function (err, user) {
+          console.log('User '+ username +' attempted to log in.');
+          if (err) { return done(err); }
+          if (!user) { return done(null, false); }
+          if (password !== user.password) { return done(null, false); }
+          return done(null, user);
+        });
+      }
+    ));
 
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
