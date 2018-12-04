@@ -1,21 +1,20 @@
 'use strict';
-require('dotenv').config()
+require('dotenv').config();
 const express     = require('express');
-const fccTesting  = require('./freeCodeCamp/fcctesting.js');
-
+var path = require('path');
 const app = express();
 
-fccTesting(app); //For FCC testing purposes
+const fccTesting  = require('./freeCodeCamp/fcctesting.js');
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 app.set('view engine', 'pug');
-
-
+fccTesting(app); //For FCC testing purposes
 app.use('/public', express.static(process.cwd() + '/public'));
-app.use(express.urlencoded({extended: false}));
-app.use(express.json);
+
 
 app.route('/')
   .get((req, res) => {
-    res.sendFile(process.cwd() + '/views/index.html');
+    res.render(process.cwd() + '/views/pug/index');
   });
 
 app.listen(process.env.PORT || 3000, () => {
