@@ -66,6 +66,18 @@ mongo.connect(process.env.MONGO_URI, (err, db) => {
       }
     ));
 
+    function ensureAuthenticated(req, res, next) {
+      if (req.isAuthenticated()) {
+        return next();
+      }
+      res.redirect('/');
+    };
+
+    app.route('/profile')
+      .get(ensureAuthenticated, (req, res) => {
+        res.render(process.cwd() + '/views/pug/profile');
+      });
+
     app.route('/login').post(passport.authenticate('local', {
       failureRedirect: '/'
     }), (req, res) => {
