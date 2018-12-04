@@ -14,7 +14,7 @@ app.use('/public', express.static(process.cwd() + '/public'));
 
 app.route('/')
   .get((req, res) => {
-    res.render(process.cwd() + '/views/pug/index');
+    res.render(process.cwd() + '/views/pug/index', {title: 'Hello', message: 'Please login'})
   });
 
 app.listen(process.env.PORT || 3000, () => {
