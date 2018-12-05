@@ -5,6 +5,7 @@ const session = require('express-session');
 
 const mongo = require('mongodb').MongoClient;
 const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
 
 const routes = require('./Routes');
 const auth = require('./Auth');
@@ -38,19 +39,30 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
   } else {
     console.log('Successful database connection');
   }
-  auth(app, db);
-  routes(app, db);
-
-  app.route('/auth/github').get((req, res) => {
-    passport.authenticate('github');
-  });
-
-  app.route('/auth/github/callback').get(passport.authenticate('github', {failureRedirect: '/' }),
-    (req, res) => {
-      res.redirect('/profile');
+  
+    app.route('/auth/github').get((req, res) => {
+        passport.authenticate('github');
     });
 
-  app.listen(process.env.PORT || 3000, () => {
-    console.log("Listening on port " + process.env.PORT);
+    app.route("/auth/github/callback").get(passport.authenticate("github", {failureRedirect: "/"}), (req, res) => {
+                res.redirect("/profile");
+            });
+  
+  const secObj = {
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: 'https://passport-fcc-proj-nastex21.glitch.me/auth/github/callback'
+  }
+  
+  passport.use(new GitHubStrategy(secObj, function(accessToken, refreshToken, profile, cb){
+     console.log(profile);
+    
+  }));
+  
+    auth(app, db);
+    routes(app, db);
+
+    app.listen(process.env.PORT || 3000, () => {
+      console.log("Listening on port " + process.env.PORT);
+    });
   });
-});
