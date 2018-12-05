@@ -38,10 +38,19 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
   } else {
     console.log('Successful database connection');
   }
-    auth(app, db);
-    routes(app, db);
+  auth(app, db);
+  routes(app, db);
 
-    app.listen(process.env.PORT || 3000, () => {
-      console.log("Listening on port " + process.env.PORT);
-    });
+  app.route('/auth/github').get((req, res) => {
+    passport.authenticate('github');
   });
+
+  app.route('/auth/github/callback').get(passport.authenticate('github', {failureRedirect: '/' }),
+    (req, res) => {
+      res.redirect('/profile');
+    });
+
+  app.listen(process.env.PORT || 3000, () => {
+    console.log("Listening on port " + process.env.PORT);
+  });
+});
