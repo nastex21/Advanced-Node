@@ -7,8 +7,8 @@ const mongo = require('mongodb').MongoClient;
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
 
-const routes = require('./Routes');
-const auth = require('./Auth');
+const routes = require('./routes');
+const auth = require('./auth');
 
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
@@ -22,16 +22,6 @@ app.use(express.json());
 app.set('view engine', 'pug');
 fccTesting(app); //For FCC testing purposes
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-
 mongo.connect(process.env.MONGO_URI, (err, client) => {
   var db = client.db('user-db');
   if (err) {
@@ -40,11 +30,18 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
     console.log('Successful database connection');
   }
   
-    app.route('/auth/github').get((req, res) => {
-        passport.authenticate('github');
-    });
+  app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+}));
 
-    app.route("/auth/github/callback").get(passport.authenticate("github", {failureRedirect: "/"}), (req, res) => {
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
+  app.route('/auth/github').get(passport.authenticate('github'));
+
+  app.route("/auth/github/callback").get(passport.authenticate("github", {failureRedirect: "/"}), (req, res) => {
                 res.redirect("/profile");
             });
   
@@ -56,8 +53,30 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
   
   passport.use(new GitHubStrategy(secObj, function(accessToken, refreshToken, profile, cb){
      console.log(profile);
+      db.collection('socialusers').findAndModify(
+    {id: profile.id},
+    {},
+    {$setOnInsert:{
+        id: profile.id,
+        name: profile.displayName || 'John Doe',
+        photo: profile.photos[0].value || '',
+        email: profile.emails[0].value || 'No public email',
+        created_on: new Date(),
+        provider: profile.provider || ''
+    },$set:{
+        last_login: new Date()
+    },$inc:{
+        login_count: 1
+    }},
+    {upsert:true, new: true},
+    (err, doc) => {
+        return cb(null, doc.value);
+    }
+);
     
   }));
+  
+
   
     auth(app, db);
     routes(app, db);
