@@ -55,17 +55,19 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
   }));
 
   io.on('connection', socket => {
-
+    
     console.log('A user has connected');
     console.log('user ' + socket.request.user.name + ' connected');
-    ++currentUsers;
-
+     ++currentUsers;
+    
     io.emit('user', {name: socket.request.user.name, currentUsers, connected: true});
-
-    socket.on('disconnect', () => {
-      --currentUsers;
-      console.log("A user has disconnected.")
-    });
+      
+    socket.on('disconnect', () => { --currentUsers; 
+                                   console.log("A user has disconnected.")});
+      
+    socket.on('chat message', (message) => {
+    io.emit('chat message', {name: socket.request.user.name, message});
+  });
   })
 
   //end socket.io code

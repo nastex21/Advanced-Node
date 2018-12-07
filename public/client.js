@@ -4,6 +4,7 @@ $( document ).ready(function() {
     $('form').submit(function(){
       var messageToSend = $('#m').val();
       //send message to server here?
+      socket.emit('chat message', messageToSend);
       $('#m').val('');
       return false; // prevent form submit from refreshing page
     });
@@ -18,6 +19,10 @@ $( document ).ready(function() {
     }
     $('#messages').append($('<li>').html('<b>'+ message +'<\/b>'));
   });
+    
+    socket.on('chat message', function(data){
+      $('#messages').append($('<li>').text(data.name+': '+data.message));
+    });
     
   });
   
