@@ -60,7 +60,7 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
         id: profile.id,
         name: profile.displayName || 'John Doe',
         photo: profile.photos[0].value || '',
-        email: profile.emails[0].value || 'No public email',
+        email: profile._json.email || 'No public email',
         created_on: new Date(),
         provider: profile.provider || ''
     },$set:{
