@@ -42,7 +42,8 @@ mongo.connect(process.env.MONGO_URI, (err, client) => {
     http.listen(process.env.PORT || 3000);
 
     //start socket.io code  
-
+    var currentUsers = 0;  
+    io.emit('user count', currentUsers);
     io.on('connection', socket => {
     
   })
