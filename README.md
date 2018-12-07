@@ -1,4 +1,5 @@
 Advanced Node and Express - Serialization of a User Object
+
 As a reminder, this project is being built upon the following starter project on Glitch, or cloned from GitHub.
 
 Serialization and deserialization are important concepts in regards to authentication. To serialize an object means to convert its contents into a small key essentially that can then be deserialized into the original object. This is what allows us to know whos communicated with the server without having to send the authentication data like username and password at each request for a new page.
