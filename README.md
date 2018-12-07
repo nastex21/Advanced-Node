@@ -1,4 +1,5 @@
 Advanced Node and Express - Set up Passport
+
 As a reminder, this project is being built upon the following starter project on Glitch, or cloned from GitHub.
 
 It's time to set up Passport so we can finally start allowing a user to register or login to an account! In addition to Passport, we will use Express-session to handle sessions. Using this middleware saves the session id as a cookie in the client and allows us to access the session data using that id on the server. This way we keep personal account information out of the cookie used by the client to verify to our server they are authenticated and just keep the key to access the data stored on the server.
